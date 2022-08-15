@@ -26,49 +26,34 @@ func main() {
 		cfg.Destination = cfg.S
 	} else if cfg.Destination == "" {
 		fmt.Println("Destination folder do not specifity")
-		os.Exit(2)
+		os.Exit(1)
 	}
 
 	if _, err := os.Stat(cfg.Source); err != nil {
 		fmt.Printf("File %v does not exist\n", cfg.Source)
+		os.Exit(2)
 	}
-
-	// fsysSource := os.DirFS(cfg.Source)
-	// err := fs.WalkDir(fsysSource, ".",
-	// 	func(p string, d fs.DirEntry, err error) error {
-	// 		fmt.Print(d.Name)
-	// 		d.Info()
-	// 		tm, e := time.Parse(cfg.Layout, d.Name())
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 		year := string(tm.Year())
-	// 		month := string(int(tm.Month()))
-	// 		e = os.Rename(path.Join(cfg.Source, d.Name()), path.Join(cfg.Destination, year, month, d.Name()))
-	// 		if e != nil {
-	// 			return err
-	// 		}
-	// 		fmt.Printf("File %v mode to %v \r", path.Join(cfg.Source, d.Name()), path.Join(cfg.Destination, year, month, d.Name()))
-	// 		return nil
-	// 	})
 
 	files, err := os.ReadDir(cfg.Source)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		fmt.Printf("Cannot read folder %v: %v", cfg.Source, err)
+		os.Exit(2)
 	}
+
 	num := strings.Count(cfg.Layout, "*")
 	layout := cfg.Layout[num:]
 	count := 0
+
 	for _, file := range files {
 		fn := file.Name()
 		if len(fn) < num+len(layout) {
+			fmt.Printf("\n File not contains date in right format")
 			continue
 		}
 		tm, e := time.Parse(layout, fn[num:num+len(layout)])
 		if e != nil {
-			fmt.Println(e)
-			os.Exit(1)
+			fmt.Printf("\n Cannot parse time from file %v: %v", fn, e)
+			continue
 		}
 		year := fmt.Sprint(tm.Year())
 		month := fmt.Sprint(int(tm.Month()))
@@ -79,15 +64,15 @@ func main() {
 		if _, err := os.Stat(destinationPath); err != nil {
 			err := os.MkdirAll(destinationPath, 0755)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(2)
+				fmt.Printf("\n Cannot create folder %v: %v", destinationPath, err)
+				continue
 			}
 		}
 
 		e = os.Rename(path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn))
 		if e != nil {
-			fmt.Println(e)
-			os.Exit(1)
+			fmt.Printf("\n Cannot move file %v to %v: %v", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), e)
+			continue
 		}
 		count++
 		fmt.Printf("File %v mode to %v. All moved files %v \r", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), count)
