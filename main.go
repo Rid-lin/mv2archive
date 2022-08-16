@@ -23,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 	if cfg.D != "" {
-		cfg.Destination = cfg.S
+		cfg.Destination = cfg.D
 	} else if cfg.Destination == "" {
 		fmt.Println("Destination folder do not specifity")
 		os.Exit(1)
@@ -47,12 +47,12 @@ func main() {
 	for _, file := range files {
 		fn := file.Name()
 		if len(fn) < num+len(layout) {
-			fmt.Printf("File not contains date in right format\n")
+			fmt.Printf("File (%v) not contains date in right format (%v)\n", fn, layout)
 			continue
 		}
 		tm, e := time.Parse(layout, fn[num:num+len(layout)])
 		if e != nil {
-			fmt.Printf("File not contains date in right format. Cannot parse time from file %v: %v\n", fn, e)
+			fmt.Printf("File (%v) not contains date in right format (%v). Cannot parse time from file %v: %v\n", fn, layout, fn, e)
 			continue
 		}
 		year := fmt.Sprint(tm.Year())
