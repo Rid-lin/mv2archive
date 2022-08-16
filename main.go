@@ -36,7 +36,7 @@ func main() {
 
 	files, err := os.ReadDir(cfg.Source)
 	if err != nil {
-		fmt.Printf("Cannot read folder %v: %v", cfg.Source, err)
+		fmt.Printf("Cannot read folder %v: %v\n", cfg.Source, err)
 		os.Exit(2)
 	}
 
@@ -47,12 +47,12 @@ func main() {
 	for _, file := range files {
 		fn := file.Name()
 		if len(fn) < num+len(layout) {
-			fmt.Printf("\n File not contains date in right format")
+			fmt.Printf("File not contains date in right format\n")
 			continue
 		}
 		tm, e := time.Parse(layout, fn[num:num+len(layout)])
 		if e != nil {
-			fmt.Printf("\n Cannot parse time from file %v: %v", fn, e)
+			fmt.Printf("File not contains date in right format. Cannot parse time from file %v: %v\n", fn, e)
 			continue
 		}
 		year := fmt.Sprint(tm.Year())
@@ -64,18 +64,18 @@ func main() {
 		if _, err := os.Stat(destinationPath); err != nil {
 			err := os.MkdirAll(destinationPath, 0755)
 			if err != nil {
-				fmt.Printf("\n Cannot create folder %v: %v", destinationPath, err)
+				fmt.Printf("Cannot create folder %v: %v\n", destinationPath, err)
 				continue
 			}
 		}
 
 		e = os.Rename(path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn))
 		if e != nil {
-			fmt.Printf("\n Cannot move file %v to %v: %v", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), e)
+			fmt.Printf("Cannot move file %v to %v: %v\n", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), e)
 			continue
 		}
 		count++
-		fmt.Printf("File %v mode to %v. All moved files %v \r", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), count)
+		fmt.Printf("\rFile %v mode to %v. All moved files %v ", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), count)
 	}
 
 	if err != nil {
