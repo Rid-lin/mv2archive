@@ -60,7 +60,11 @@ func main() {
 		if len(month) == 1 {
 			month = "0" + month
 		}
-		destinationPath := path.Join(cfg.Destination, year, month)
+		day := fmt.Sprint(tm.Day())
+		if len(day) == 1 {
+			day = "0" + day
+		}
+		destinationPath := path.Join(cfg.Destination, year, month, day)
 		if _, err := os.Stat(destinationPath); err != nil {
 			err := os.MkdirAll(destinationPath, 0755)
 			if err != nil {
@@ -69,13 +73,13 @@ func main() {
 			}
 		}
 
-		e = os.Rename(path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn))
+		e = os.Rename(path.Join(cfg.Source, fn), path.Join(destinationPath, fn))
 		if e != nil {
-			fmt.Printf("Cannot move file %v to %v: %v\n", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), e)
+			fmt.Printf("Cannot move file %v to %v: %v\n", path.Join(cfg.Source, fn), path.Join(destinationPath, fn), e)
 			continue
 		}
 		count++
-		fmt.Printf("\rFile %v mode to %v. All moved files %v ", path.Join(cfg.Source, fn), path.Join(cfg.Destination, year, month, fn), count)
+		fmt.Printf("\rFile %v mode to %v. All moved files %v ", path.Join(cfg.Source, fn), path.Join(destinationPath, fn), count)
 	}
 
 	if err != nil {
