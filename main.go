@@ -79,7 +79,7 @@ func main() {
 			continue
 		}
 		count++
-		fmt.Printf("\rFile %v mode to %v. All moved files %v ", path.Join(cfg.Source, fn), path.Join(destinationPath, fn), count)
+		fmt.Printf("\rFile %v move to %v. All moved files %v", fn, destinationPath, count)
 	}
 
 	if err != nil {
